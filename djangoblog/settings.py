@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 import sys
 
-from django.utils.translation import gettext_lazy as _
-
 
 def env_to_bool(env, default):
     str_val = os.environ.get(env)
@@ -64,10 +62,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     # 'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -108,12 +104,11 @@ WSGI_APPLICATION = 'djangoblog.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DJANGO_MYSQL_DATABASE') or 'djangoblog',
-        'USER': os.environ.get('DJANGO_MYSQL_USER') or 'root',
-        'PASSWORD': os.environ.get('DJANGO_MYSQL_PASSWORD') or 'root',
-        'HOST': os.environ.get('DJANGO_MYSQL_HOST') or '127.0.0.1',
-        'PORT': int(
-            os.environ.get('DJANGO_MYSQL_PORT') or 3306),
+        'NAME': 'djangoblog',
+        'USER': 'root',
+        'PASSWORD': 'efiEoui0',
+        'HOST': "localhost",
+        'PORT': 3306,
         'OPTIONS': {
             'charset': 'utf8mb4'},
     }}
@@ -136,14 +131,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGES = (
-    ('en', _('English')),
-    ('zh-hans', _('Simplified Chinese')),
-    ('zh-hant', _('Traditional Chinese')),
-)
-LOCALE_PATHS = (
-    os.path.join(BASE_DIR, 'locale'),
-)
+# Internationalization
+# https://docs.djangoproject.com/en/1.10/topics/i18n/
 
 LANGUAGE_CODE = 'zh-hans'
 
@@ -174,6 +163,14 @@ AUTHENTICATION_BACKENDS = [
 STATIC_ROOT = os.path.join(BASE_DIR, 'collectedstatic')
 
 STATIC_URL = '/static/'
+# The absolute path to the directory where collectstatic will collect static files for deployment.
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
 STATICFILES = os.path.join(BASE_DIR, 'static')
 
 AUTH_USER_MODEL = 'accounts.BlogUser'

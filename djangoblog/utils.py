@@ -9,13 +9,10 @@ import string
 import uuid
 from hashlib import sha256
 
-import bleach
 import markdown
 import requests
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.templatetags.static import static
 
 logger = logging.getLogger(__name__)
 
@@ -153,7 +150,7 @@ def get_blog_setting():
         from blog.models import BlogSettings
         if not BlogSettings.objects.count():
             setting = BlogSettings()
-            setting.site_name = 'djangoblog'
+            setting.sitename = 'djangoblog'
             setting.site_description = '基于Django的博客系统'
             setting.site_seo_description = '基于Django的博客系统'
             setting.site_keywords = 'Django,Python'
@@ -162,10 +159,9 @@ def get_blog_setting():
             setting.sidebar_comment_count = 5
             setting.show_google_adsense = False
             setting.open_site_comment = True
-            setting.analytics_code = ''
-            setting.beian_code = ''
+            setting.analyticscode = ''
+            setting.beiancode = ''
             setting.show_gongan_code = False
-            setting.comment_need_review = False
             setting.save()
         value = BlogSettings.objects.first()
         logger.info('set cache get_blog_setting')
@@ -179,26 +175,34 @@ def save_user_avatar(url):
     :param url:头像url
     :return: 本地路径
     '''
+    setting = get_blog_setting()
     logger.info(url)
 
     try:
-        basedir = os.path.join(settings.STATICFILES, 'avatar')
+        imgname = url.split('/')[-1]
+        if imgname:
+            path = r'{basedir}/avatar/{img}'.format(
+                basedir=setting.resource_path, img=imgname)
+            if os.path.exists(path):
+                os.remove(path)
         rsp = requests.get(url, timeout=2)
         if rsp.status_code == 200:
-            if not os.path.exists(basedir):
-                os.makedirs(basedir)
+            basepath = r'{basedir}/avatar/'.format(
+                basedir=setting.resource_path)
+            if not os.path.exists(basepath):
+                os.makedirs(basepath)
 
-            image_extensions = ['.jpg', '.png', 'jpeg', '.gif']
-            isimage = len([i for i in image_extensions if url.endswith(i)]) > 0
+            imgextensions = ['.jpg', '.png', 'jpeg', '.gif']
+            isimage = len([i for i in imgextensions if url.endswith(i)]) > 0
             ext = os.path.splitext(url)[1] if isimage else '.jpg'
-            save_filename = str(uuid.uuid4().hex) + ext
-            logger.info('保存用户头像:' + basedir + save_filename)
-            with open(os.path.join(basedir, save_filename), 'wb+') as file:
+            savefilename = str(uuid.uuid4().hex) + ext
+            logger.info('保存用户头像:' + basepath + savefilename)
+            with open(basepath + savefilename, 'wb+') as file:
                 file.write(rsp.content)
-            return static('avatar/' + save_filename)
+            return 'https://resource.lylinux.net/avatar/' + savefilename
     except Exception as e:
         logger.error(e)
-        return static('blog/img/avatar.png')
+        return url
 
 
 def delete_sidebar_cache():
@@ -213,20 +217,3 @@ def delete_view_cache(prefix, keys):
     from django.core.cache.utils import make_template_fragment_key
     key = make_template_fragment_key(prefix, keys)
     cache.delete(key)
-
-
-def get_resource_url():
-    if settings.STATIC_URL:
-        return settings.STATIC_URL
-    else:
-        site = get_current_site()
-        return 'http://' + site.domain + '/static/'
-
-
-ALLOWED_TAGS = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul', 'h1',
-                'h2', 'p']
-ALLOWED_ATTRIBUTES = {'a': ['href', 'title'], 'abbr': ['title'], 'acronym': ['title']}
-
-
-def sanitize_html(html):
-    return bleach.clean(html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
