@@ -1,6 +1,8 @@
 bin/data/
 # virtualenv
 venv/
+migrations/
+!migrations/__init__.py
 collectedstatic/
 djangoblog/whoosh_index/
 uploads/
@@ -8,4 +10,3 @@ settings_production.py
 *.md
 docs/
 logs/
-static/

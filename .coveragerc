@@ -6,5 +6,6 @@ omit =
     *tests*
     *.html
     *whoosh_cn_backend*
+    *oauth*
     *settings.py*
     *venv*
