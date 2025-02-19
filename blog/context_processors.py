@@ -17,7 +17,7 @@ def seo_processor(requests):
         logger.info('set processor cache.')
         setting = get_blog_setting()
         value = {
-            'SITE_NAME': setting.site_name,
+            'SITE_NAME': setting.sitename,
             'SHOW_GOOGLE_ADSENSE': setting.show_google_adsense,
             'GOOGLE_ADSENSE_CODES': setting.google_adsense_codes,
             'SITE_SEO_DESCRIPTION': setting.site_seo_description,
@@ -30,14 +30,10 @@ def seo_processor(requests):
                 type='p',
                 status='p'),
             'OPEN_SITE_COMMENT': setting.open_site_comment,
-            'BEIAN_CODE': setting.beian_code,
-            'ANALYTICS_CODE': setting.analytics_code,
+            'BEIAN_CODE': setting.beiancode,
+            'ANALYTICS_CODE': setting.analyticscode,
             "BEIAN_CODE_GONGAN": setting.gongan_beiancode,
             "SHOW_GONGAN_CODE": setting.show_gongan_code,
-            "CURRENT_YEAR": timezone.now().year,
-            "GLOBAL_HEADER": setting.global_header,
-            "GLOBAL_FOOTER": setting.global_footer,
-            "COMMENT_NEED_REVIEW": setting.comment_need_review,
-        }
+            "CURRENT_YEAR": timezone.now().year}
         cache.set(key, value, 60 * 60 * 10)
         return value
