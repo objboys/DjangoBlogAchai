@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.exceptions import ValidationError
 from django.forms import widgets
-from django.utils.translation import gettext_lazy as _
+
 from . import utils
 from .models import BlogUser
 
@@ -33,7 +33,7 @@ class RegisterForm(UserCreationForm):
     def clean_email(self):
         email = self.cleaned_data['email']
         if get_user_model().objects.filter(email=email).exists():
-            raise ValidationError(_("email already exists"))
+            raise ValidationError("该邮箱已经存在.")
         return email
 
     class Meta:
@@ -43,11 +43,11 @@ class RegisterForm(UserCreationForm):
 
 class ForgetPasswordForm(forms.Form):
     new_password1 = forms.CharField(
-        label=_("New password"),
+        label="新密码",
         widget=forms.PasswordInput(
             attrs={
                 "class": "form-control",
-                'placeholder': _("New password")
+                'placeholder': "密码"
             }
         ),
     )
@@ -57,7 +57,7 @@ class ForgetPasswordForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "class": "form-control",
-                'placeholder': _("Confirm password")
+                'placeholder': "确认密码"
             }
         ),
     )
@@ -67,17 +67,17 @@ class ForgetPasswordForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control',
-                'placeholder': _("Email")
+                'placeholder': "邮箱"
             }
         ),
     )
 
     code = forms.CharField(
-        label=_('Code'),
+        label='验证码',
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control',
-                'placeholder': _("Code")
+                'placeholder': "验证码"
             }
         ),
     )
@@ -86,7 +86,7 @@ class ForgetPasswordForm(forms.Form):
         password1 = self.data.get("new_password1")
         password2 = self.data.get("new_password2")
         if password1 and password2 and password1 != password2:
-            raise ValidationError(_("passwords do not match"))
+            raise ValidationError("两次密码不一致")
         password_validation.validate_password(password2)
 
         return password2
@@ -97,7 +97,7 @@ class ForgetPasswordForm(forms.Form):
                 email=user_email
         ).exists():
             # todo 这里的报错提示可以判断一个邮箱是不是注册过，如果不想暴露可以修改
-            raise ValidationError(_("email does not exist"))
+            raise ValidationError("未找到邮箱对应的用户")
         return user_email
 
     def clean_code(self):
@@ -113,5 +113,5 @@ class ForgetPasswordForm(forms.Form):
 
 class ForgetPasswordCodeForm(forms.Form):
     email = forms.EmailField(
-        label=_('Email'),
+        label="邮箱号"
     )
